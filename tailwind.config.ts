@@ -12,7 +12,7 @@ const config: Config = {
         tomato: "120px",
       },
       borderRadius: {
-        "sexy-name": "11.11px",
+        "sexy-name": "4.22px",
       },
     },
   },

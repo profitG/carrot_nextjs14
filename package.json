@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@tailwindcss/forms": "^0.5.7",
+    "javascript": "^1.0.0",
     "next": "14.2.5",
     "node": "^18.20.4",
     "react": "^18",
