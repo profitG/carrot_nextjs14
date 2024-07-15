@@ -17,6 +17,7 @@ export default function Home() {
             </div>
           </div>
         ))}
+        <button className="btn">Cool</button>
       </div>
     </main>
   );
