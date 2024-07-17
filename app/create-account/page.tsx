@@ -5,6 +5,7 @@ import { useFormState } from "react-dom";
 import { createAccount } from "./actions";
 import Input from "@/components/input";
 import Button from "@/components/button";
+import { PASSWORD_MIN_LENGTH, PASSWORD_REGEX } from "@/lib/constants";
 
 export default function CreateAccount() {
   const [state, trigger] = useFormState(createAccount, null);
@@ -21,8 +22,6 @@ export default function CreateAccount() {
           required
           name="username"
           errors={state?.fieldErrors.username}
-          minLength={3}
-          maxLength={10}
         />
         <Input
           type="email"
@@ -37,7 +36,7 @@ export default function CreateAccount() {
           required
           name="password"
           errors={state?.fieldErrors.password}
-          minLength={4}
+          minLength={PASSWORD_MIN_LENGTH}
         />
         <Input
           type="password"
@@ -45,7 +44,7 @@ export default function CreateAccount() {
           required
           name="confirmPassword"
           errors={state?.fieldErrors.confirmPassword}
-          minLength={4}
+          minLength={PASSWORD_MIN_LENGTH}
         />
         <Button text="Create account" />
       </form>
