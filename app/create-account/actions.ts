@@ -1,5 +1,11 @@
 "use server";
-import { PASSWORD_MIN_LENGTH, PASSWORD_REGEX } from "@/lib/constants";
+import {
+  PASSWORD_MIN_LENGTH,
+  PASSWORD_REGEX,
+  PASSWORD_REGEX_ERROR,
+  USERNAME_REGEX,
+  USERNAME_REGEX_ERROR,
+} from "@/lib/constants";
 import db from "@/lib/db";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -46,17 +52,15 @@ const formSchema = z
         invalid_type_error: "Username must be a string",
         required_error: "Where is your Username",
       })
-      .toLowerCase(),
+      .toLowerCase()
+      .regex(USERNAME_REGEX, USERNAME_REGEX_ERROR),
     // .refine(checkUsername, "already exist")
     email: z.string().email().trim().toLowerCase(),
     // .refine(checkEmail, "already exist")
     password: z
       .string()
       .min(PASSWORD_MIN_LENGTH)
-      .regex(
-        PASSWORD_REGEX,
-        "A password must have lowercase, uppercase, a number and special characters"
-      ),
+      .regex(PASSWORD_REGEX, PASSWORD_REGEX_ERROR),
     confirmPassword: z.string().min(PASSWORD_MIN_LENGTH),
   })
   .superRefine(async ({ username }, ctx) => {

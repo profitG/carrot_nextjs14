@@ -5,3 +5,8 @@ export const PASSWORD_REGEX = new RegExp(
 
 export const PASSWORD_REGEX_ERROR =
   "A password must have lowercase, uppercase, a number and special characters";
+
+export const USERNAME_REGEX = new RegExp(/^[a-z0-9]+$/);
+
+export const USERNAME_REGEX_ERROR =
+  "A password must have no special characters";
