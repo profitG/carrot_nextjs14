@@ -47,7 +47,6 @@ export async function GET(request: NextRequest) {
     },
   });
   await saveUserIdInCookie(newUser);
-  console.log(newUser);
   return redirect("/profile");
 }
 
