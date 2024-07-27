@@ -10,6 +10,7 @@ import { useFormState } from "react-dom";
 export default function AddProduct() {
   const [preview, setPreview] = useState("");
   const [uploadUrl, setUploadUrl] = useState("");
+  const [imageId, setImageId] = useState("");
   const onImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const {
       target: { files },
@@ -23,10 +24,28 @@ export default function AddProduct() {
     const { success, result } = await getUploadUrl();
     if (success) {
       const { id, uploadURL } = result;
+      setImageId(id);
       setUploadUrl(uploadURL);
     }
   };
-  const [state, action] = useFormState(uploadProduct, null);
+  const interceptAction = async (_: any, formData: FormData) => {
+    const file = formData.get("photo");
+    if (file) {
+      const cloudflareForm = new FormData();
+      cloudflareForm.append("file", file);
+      const response = await fetch(uploadUrl, {
+        method: "POST",
+        body: cloudflareForm,
+      });
+      if (response.status !== 200) {
+        return;
+      }
+    }
+    const photoUrl = `https://imagedelivery.net/jf1DgOzBqPYbYPP-Hk9Z-A/${imageId}`;
+    formData.set("photo", photoUrl);
+    return uploadProduct(_, formData);
+  };
+  const [state, action] = useFormState(interceptAction, null);
   return (
     <div className="p-5">
       <form action={action} className="flex flex-col gap-5">
