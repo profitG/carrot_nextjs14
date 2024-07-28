@@ -1,5 +1,6 @@
 import db from "@/lib/db";
 import getSession from "@/lib/session";
+import { chkOverlap, getAccessToken, getAPI } from "@/lib/utils";
 import { redirect } from "next/navigation";
 import { NextRequest } from "next/server";
 
@@ -59,60 +60,8 @@ export async function GET(request: NextRequest) {
     3. github의 email을 user email로 동일한 access-token을 받아서 가져오기
 */
 
-export async function saveUserIdInCookie(user: { id: number }) {
+async function saveUserIdInCookie(user: { id: number }) {
   const session = await getSession();
   session.id = user.id;
   await session.save();
-}
-
-export async function chkOverlap(login: string) {
-  const findUserName = findUN(login);
-  let newName = login;
-  if (findUserName != null) {
-    newName = login + `-git`;
-  }
-
-  return newName;
-}
-
-export async function findUN(login: string) {
-  const findUserName = await db.user.findUnique({
-    where: {
-      username: login,
-    },
-    select: {
-      username: true,
-    },
-  });
-  return findUserName;
-}
-
-export async function getAccessToken(code: string) {
-  const accessTokenParams = new URLSearchParams({
-    client_id: process.env.GITHUB_CLIENT_ID!,
-    client_secret: process.env.GITHUB_CLIENT_SECRET!,
-    code,
-  }).toString();
-  const accessTokenURL = `https://github.com/login/oauth/access_token?${accessTokenParams}`;
-  return accessTokenURL;
-}
-
-export async function getAPI(accessTokenURL: string) {
-  const accessTokenResponse = await fetch(accessTokenURL, {
-    method: "POST",
-    headers: { Accept: "application/json" },
-  });
-  const { error, access_token } = await accessTokenResponse.json();
-  if (error) {
-    return new Response(null, {
-      status: 400,
-    });
-  }
-  const userProfileResponse = await fetch("https://api.github.com/user", {
-    headers: {
-      Authorization: `Bearer ${access_token}`,
-    },
-    cache: "no-cache",
-  });
-  return userProfileResponse;
 }
