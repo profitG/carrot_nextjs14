@@ -36,6 +36,9 @@ export const metadata = {
   title: "Products",
 };
 
+// export const dynamic = "force-dynamic";
+// export const revalidate = 60;
+
 export type InitialProducts = Prisma.PromiseReturnType<
   typeof getInitialProducts
 >;
@@ -62,3 +65,16 @@ export default async function Products() {
     </div>
   );
 }
+
+/*
+product의 cache 방식을 결정해라
+1. dynamic
+2. revalidate
+3. revalidatePath
+4. revalidateTag
+구현하고 제품 업로드 server action에 연결
+업로드 할 때마다? 혹은 뭐 어쨋든 최신 업데이트 된 제품을 보여줄 수 있도록
+---------------------------------------------------------------
+제품 편집 페이지를 만들어서 편집할 수 있도록 하고
+cache도 연결
+*/
