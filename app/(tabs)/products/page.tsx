@@ -37,7 +37,7 @@ export const metadata = {
 };
 
 // export const dynamic = "force-dynamic";
-// export const revalidate = 60;
+export const revalidate = 60;
 
 export type InitialProducts = Prisma.PromiseReturnType<
   typeof getInitialProducts
