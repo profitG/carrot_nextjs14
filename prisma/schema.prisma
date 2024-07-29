@@ -20,6 +20,11 @@ model User{
   updated_at DateTime @updatedAt
   SMSToken SMSToken[]
   Product Product[]
+  post Post[]
+
+  Comment Comment[]
+
+  Like Like[]
 }
 
 model SMSToken{
@@ -39,6 +44,48 @@ model Product{
   price Float
   description String
   photo String
-  user User @relation(fields: [userid], references: [id])
+  user User @relation(fields: [userid], references: [id], onDelete: Cascade)
   userid Int
+}
+
+model Post{
+  id Int @id @default(autoincrement())
+  title String
+  description String?
+  views Int @default(0)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  use User @relation(fields: [userid], references: [id], onDelete: Cascade)
+  userid Int
+
+  comments Comment[]
+
+  likes Like[]
+}
+
+model Like{
+  @@id(name:"id", [userid, postid])
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user User @relation(fields: [userid], references: [id], onDelete: Cascade)
+  userid Int
+
+  post Post @relation(fields: [postid], references: [id], onDelete: Cascade)
+  postid Int
+
+}
+
+model Comment{
+  id Int @id @default(autoincrement())
+  payload String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user User @relation(fields: [userid], references: [id], onDelete: Cascade)
+  userid Int  
+
+  post Post @relation(fields: [postid], references: [id], onDelete: Cascade)
+  postid Int
 }
