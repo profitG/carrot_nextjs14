@@ -2,10 +2,12 @@ import db from "@/lib/db";
 import getSession from "@/lib/session";
 import { formatToDate } from "@/lib/utils";
 import { EyeIcon, HeartIcon } from "@heroicons/react/24/solid";
+import { HeartIcon as OutlineHeartIcon } from "@heroicons/react/24/outline";
 import { revalidateTag } from "next/cache";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { unstable_cache as nextCache } from "next/cache";
+import LikeButton from "@/components/like-button";
 
 async function getPost(id: number) {
   try {
@@ -28,7 +30,6 @@ async function getPost(id: number) {
         _count: {
           select: {
             comments: true,
-            likes: true,
           },
         },
       },
@@ -41,7 +42,8 @@ async function getPost(id: number) {
 }
 
 const getCachedPost = nextCache(getPost, ["Post-detail"], {
-  tags: ["post-likes"],
+  tags: ["detail"],
+  revalidate: 60,
 });
 
 export default async function PostDetail({
@@ -58,49 +60,43 @@ export default async function PostDetail({
     return notFound();
   }
 
-  async function getIsLiked(postid: number) {
-    const session = await getSession();
-    const like = await db.like.findUnique({
+  async function getLikeStatus(postid: number, userid: number) {
+    //const session = await getSession();
+    const isLiked = await db.like.findUnique({
       where: {
         id: {
           postid,
-          userid: session.id!,
+          userid,
         },
       },
     });
 
-    return Boolean(like);
+    const likeCount = await db.like.count({
+      where: {
+        postid,
+      },
+    });
+    return {
+      likeCount,
+      isLiked: Boolean(isLiked),
+    };
   }
-  const likePost = async () => {
-    "use server";
-    try {
-      const session = await getSession();
-      await db.like.create({
-        data: {
-          postid: id,
-          userid: session.id!,
-        },
-      });
-    } catch (e) {}
-    revalidateTag("post-likes");
-  };
 
-  const disLikePost = async () => {
-    "use server";
-    try {
-      const session = await getSession();
-      await db.like.delete({
-        where: {
-          id: {
-            postid: id,
-            userid: session.id!,
-          },
-        },
-      });
-    } catch (e) {}
-    revalidateTag("post-likes");
-  };
-  const isLiked = await getIsLiked(id);
+  // const getCachedLikeStatus = nextCache(getLikeStatus, ["like-status"], {
+  //   tags: ["likes"],
+  // });
+
+  async function getCachedLikeStatus(postId: number) {
+    const session = await getSession();
+    const userId = session.id;
+    const cachedOperation = nextCache(getLikeStatus, ["product-like-status"], {
+      tags: [`like-status-${postId}`],
+    });
+    return cachedOperation(postId, userId!);
+  }
+
+  const { likeCount, isLiked } = await getCachedLikeStatus(id);
+
   return (
     <div className="p-5 text-white">
       <div className="flex items-center gap-3 mb-4">
@@ -127,15 +123,21 @@ export default async function PostDetail({
           <EyeIcon className="size-5" />
           <span>{post.views}</span>
         </div>
-        <form action={isLiked ? disLikePost : likePost}>
-          <button
-            className={`flex items-center gap-2 text-neutral-400 text-sm border border-neutral-400 rounded-full p-2 hover:bg-neutral-800 transition-colors`}
-          >
-            <HeartIcon className="size-5" />
-            <span>{post._count.likes}</span>
-          </button>
-        </form>
+        <LikeButton isLiked={isLiked} likeCount={likeCount} postId={id} />
       </div>
     </div>
   );
 }
+
+/*
+
+유저가 댓글을 작성할 수 있는 form을 생성하고
+useOptimistic을 통해 댓글을 submit 할 때마다
+바로바로 추가하도록
+백엔드에서 댓글 목록을 받아오고
+그 댓글을 useOptimistic을 사용하는 다른 component로 전달
+reduceFn의 형태가 대략 => [...previousComment, {newComment}]
+
+
+
+*/

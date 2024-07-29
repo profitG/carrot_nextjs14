@@ -1,5 +1,4 @@
 import db from "./db";
-import getSession from "./session";
 
 export function formatToWon(price: number) {
   return price.toLocaleString("ko-KR");
