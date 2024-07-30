@@ -27,6 +27,7 @@ async function getPosts() {
       },
     },
   });
+  console.log(posts);
   return posts;
 }
 
