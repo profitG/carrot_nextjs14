@@ -53,9 +53,9 @@ export default async function Products() {
   return (
     <div>
       <ProductList initialProduct={initialProducts} />
-      <form action={revalidate}>
+      {/* <form action={revalidate}>
         <button>Revalidate</button>
-      </form>
+      </form> */}
       <Link
         href="/products/add"
         className="transition-colors hover:bg-orange-400 flex flex-col text-white items-center justify-center rounded-full size-16 fixed bottom-24 right-8 bg-orange-500"

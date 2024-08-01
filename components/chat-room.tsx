@@ -33,7 +33,7 @@ export default function ChatRoomList({
   const router = useRouter();
 
   return (
-    <div className="p-5 border-b-2 border-neutral-400">
+    <div className="p-5">
       {chatRooms && chatRooms.length > 0 ? (
         chatRooms.map((room) => {
           const otherUser = room.users.find((user) => user.id !== sessionId);
@@ -41,7 +41,7 @@ export default function ChatRoomList({
             <div
               key={room.id}
               onClick={() => router.push(`/chats/${room.id}`)}
-              className="flex gap-3 items-center"
+              className="flex gap-3 py-3 items-center border-b-2 border-neutral-500"
             >
               <div>
                 <img
